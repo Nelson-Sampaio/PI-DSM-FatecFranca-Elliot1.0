@@ -5,10 +5,11 @@ import { mockProducts } from "@/mocks/data";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Product } from "@/types";
 
 export default function SupplierEstoquePage() {
-  const [products, setProducts] = useState(mockProducts);
-  const [totalUnidades, setTotalUnidades] = useState(4); // O mock tem 4 unidades no total (3 P + 1 G)
+  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [totalUnidades, setTotalUnidades] = useState(4);
 
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
@@ -16,12 +17,14 @@ export default function SupplierEstoquePage() {
         const novoEstoqueP = Number(event.newValue);
 
         setProducts((prevProducts) => {
-          // Criamos um clone profundo para o React detectar a mudança
+          // Clone profundo para o React detectar a mudança
           const novosProdutos = JSON.parse(JSON.stringify(prevProducts));
 
-          const product = novosProdutos.find((p: any) => p.id === "p1");
+          const product = novosProdutos.find((p: Product) => p.id === "p1");
           if (product) {
-            const variant = product.variants.find((v: any) => v.id === "v1");
+            const variant = product.variants.find(
+              (v: Product["variants"][number]) => v.id === "v1",
+            );
             if (variant) {
               variant.stockMain = novoEstoqueP;
             }
@@ -30,8 +33,6 @@ export default function SupplierEstoquePage() {
           return novosProdutos;
         });
 
-        // Calcula o total exato baseado no novo estoque
-        // (Isso vai garantir que o número 4 vire 3 corretamente)
         setTotalUnidades((prevTotal) => prevTotal - 1);
       }
     };

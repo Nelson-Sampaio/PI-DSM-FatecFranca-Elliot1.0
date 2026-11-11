@@ -1,113 +1,223 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { useFinance } from "@/lib/contexts/FinanceContext";
+import { Bell, ArrowRight, Trash2 } from "lucide-react"; // Adicionei o Trash2
 
-export default function SellerHome() {
-  const marketplaces = [
-    { name: "Shopee", status: "Conectado", color: "success" },
-    { name: "Mercado Livre", status: "Conectado", color: "success" },
-    { name: "TikTok Shop", status: "Requer Atenção", color: "warning" },
-    { name: "Shein", status: "Desconectado", color: "danger" },
-  ] as const;
+export default function SellerDashboard() {
+  // 1. Desestruturamos o resetarDados aqui
+  const { data, processarPagamento, resetarDados } = useFinance();
+  const [hasNotifications, setHasNotifications] = useState(true);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      const saved = localStorage.getItem("eliot_finance_data");
+      if (saved) {
+        window.dispatchEvent(new Event("storage"));
+      }
+    };
+    window.addEventListener("focus", handleUpdate);
+    return () => window.removeEventListener("focus", handleUpdate);
+  }, []);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+
+  const getFaturamentoStatus = () => {
+    if (data.faturamentoTotal <= 100) {
+      return {
+        label: "Abaixo do Esperado",
+        badgeColor: "bg-red-200 text-red-800",
+        cardBg: "bg-red-50",
+        borderColor: "border-red-500",
+      };
+    }
+    if (data.faturamentoTotal <= 500) {
+      return {
+        label: "Satisfatório",
+        badgeColor: "bg-blue-200 text-blue-800",
+        cardBg: "bg-blue-50",
+        borderColor: "border-blue-500",
+      };
+    }
+    return {
+      label: "Ótimo Desempenho",
+      badgeColor: "bg-green-200 text-green-800",
+      cardBg: "bg-green-50",
+      borderColor: "border-green-500",
+    };
+  };
+
+  const faturamentoStatus = getFaturamentoStatus();
 
   return (
     <div className="space-y-6">
+      {/* ========================================================= */}
+      {/* CABEÇALHO (Aqui vai o botão de Reset e de Notificação)    */}
+      {/* ========================================================= */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-brand-text">Visão Geral</h1>
+          <h1 className="text-2xl font-bold text-brand-text">Bom dia, Amanda.</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Bem-vinda de volta, Amanda. Aqui está o resumo da sua operação.
+            Boas histórias abrem conversas. Bons produtos fecham vendas.
           </p>
         </div>
-        <Button className="bg-sidebar hover:bg-sidebar-active text-white">
-          Sincronizar Lojas
-        </Button>
+        
+        {/* Bloco da direita (Reset + Notificação) */}
+        <div className="flex items-center gap-4">
+          {/* Botão de Reset */}
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              if(confirm("Tem certeza que deseja zerar todos os dados da simulação?")) {
+                resetarDados();
+                window.location.reload();
+              }
+            }}
+            className="text-red-500 border-red-200 hover:bg-red-50 flex items-center gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            Zerar Simulação
+          </Button>
+
+          {/* Botão de Notificação */}
+          <div className="relative">
+            <Button variant="outline" className="relative px-4 py-2 border-border bg-white">
+              <Bell className="w-5 h-5 text-gray-600" />
+              {hasNotifications && (
+                <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-status-danger-text rounded-full animate-pulse"></span>
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* KPIs Financeiros */}
+      {/* Grid de KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6">
-          <p className="text-sm text-gray-500 mb-1">Faturamento (Mês)</p>
-          <h3 className="text-3xl font-bold text-brand-text">R$ 12.450,00</h3>
-          <p className="text-xs text-status-success-text mt-2">↑ 8% em relação ao mês anterior</p>
-        </Card>
-        <Card className="p-6">
-          <p className="text-sm text-gray-500 mb-1">Margem Média</p>
-          <h3 className="text-3xl font-bold text-brand-text">32%</h3>
-          <p className="text-xs text-gray-500 mt-2">Após taxas de marketplace e frete</p>
-        </Card>
-        <Card className="p-6">
-          <p className="text-sm text-gray-500 mb-1">Pedidos no Mês</p>
-          <h3 className="text-3xl font-bold text-brand-text">142</h3>
-          <p className="text-xs text-gray-500 mt-2">Em 3 canais ativos</p>
-        </Card>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <Card className={`p-6 border-t-4 ${faturamentoStatus.borderColor} ${faturamentoStatus.cardBg} shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer`}>
+            <p className="text-sm text-gray-600 mb-1">Faturamento (Mês)</p>
+            <h3 className="text-3xl font-bold text-brand-text">{formatCurrency(data.faturamentoTotal)}</h3>
+            <div className="mt-3">
+              <span className={`text-xs font-bold px-2 py-1 rounded-full ${faturamentoStatus.badgeColor}`}>
+                {faturamentoStatus.label}
+              </span>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}>
+          <Card className={`p-6 border-t-4 ${faturamentoStatus.borderColor} ${faturamentoStatus.cardBg} shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer`}>
+            <p className="text-sm text-gray-600 mb-1">Comissões Confirmadas</p>
+            <h3 className="text-3xl font-bold text-brand-text">{formatCurrency(data.comissoes)}</h3>
+            <p className="text-xs text-gray-500 mt-3">Disponível para saque em D+14</p>
+          </Card>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}>
+          <Card className={`p-6 border-t-4 ${faturamentoStatus.borderColor} ${faturamentoStatus.cardBg} shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer`}>
+            <p className="text-sm text-gray-600 mb-1">Pedidos Processados</p>
+            <h3 className="text-3xl font-bold text-brand-text">{data.pedidosProcessados}</h3>
+            <p className="text-xs text-gray-500 mt-3">Vendas confirmadas via Marketplace</p>
+          </Card>
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Status das Integrações */}
-        <Card className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-brand-text">Minhas Integrações</h2>
-              <p className="text-sm text-gray-500">Status das conexões com os marketplaces.</p>
-            </div>
+      {/* Seção de Produtos (Fundo Verde) */}
+      <div className="bg-[#E6EFE9] p-6 rounded-2xl relative">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-brand-text">Seleção do Mês · Casa Natural</h2>
+            <p className="text-sm text-gray-600">Uma seleção pessoal vale mais que um catálogo inteiro.</p>
           </div>
+        </div>
 
-          <div className="space-y-4">
-            {marketplaces.map((mp) => (
-              <div key={mp.name} className="flex items-center justify-between border-b border-border pb-3 last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-gray-400">
-                    {mp.name.substring(0, 2).toUpperCase()}
-                  </div>
-                  <span className="font-medium text-brand-text">{mp.name}</span>
-                </div>
-                <Badge
-                  variant={
-                    mp.color === "success"
-                      ? "default"
-                      : mp.color === "warning"
-                        ? "secondary"
-                        : "destructive"
-                  }
-                >
-                  {mp.status}
-                </Badge>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { id: "p1", name: "Conj. Fitness Preto", price: 104.41, image: "/marketplace/conjunto1.jpg", isIntegrated: false },
+            { id: "p2", name: "Macaquinho Fitness", price: 129.90, image: "/marketplace/macaquino1.jpg", isIntegrated: true },
+            { id: "p3", name: "Macacão Fitness", price: 104.41, image: "/marketplace/macacao1.jpg", isIntegrated: false },
+          ].map((prod) => (
+            <Card key={prod.id} className="p-4 bg-white border border-transparent hover:border-brand-primary/20 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:bg-[#F8FAF9] group">
+              <div className="aspect-[4/4] bg-white/80 rounded-lg mb-3 overflow-hidden flex items-center justify-center p-2">
+                <img src={prod.image} alt={prod.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" />
               </div>
-            ))}
-          </div>
-        </Card>
+              <h3 className="font-semibold text-brand-text text-sm truncate">{prod.name}</h3>
+              <p className="text-lg font-bold text-brand-primary mt-1">{formatCurrency(prod.price)}</p>
 
-        {/* Alerta de Reposição */}
-                {/* Top Produtos */}
-        <Card className="p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-lg font-semibold text-brand-text">Top Produtos do Mês</h2>
-              <p className="text-sm text-gray-500">Os itens que mais geraram receita.</p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            {[
-              { name: "Camisa Social Azul", sales: "45 vendas" },
-              { name: "Camisa Social Rosa", sales: "38 vendas" },
-              { name: "Camisa Social Verde", sales: "22 vendas" },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between border-b border-border pb-3 last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center font-bold text-brand-primary">
-                    {idx + 1}º
-                  </div>
-                  <span className="font-medium text-brand-text text-sm">{item.name}</span>
-                </div>
-                <span className="text-xs text-gray-500">{item.sales}</span>
+              <div className="mt-4">
+                {prod.isIntegrated ? (
+                  <Button disabled className="w-full bg-status-success-bg text-status-success-text h-8 text-xs font-semibold">
+                    Produto Integrado
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={() => alert("Produto integrado com sucesso ao marketplace!")}
+                    className="w-full bg-sidebar hover:bg-sidebar-active text-white h-8 text-xs font-semibold"
+                  >
+                    Integrar Produto
+                  </Button>
+                )}
               </div>
-            ))}
-          </div>
-        </Card>
+            </Card>
+          ))}
+        </div>
       </div>
+
+      {/* Seção de Últimas Vendas (Dinâmica e Funcional) */}
+      <Card className="p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-brand-text">Suas últimas vendas</h2>
+          <Button variant="ghost" className="text-brand-primary text-sm flex items-center gap-1">
+            Ver todas <ArrowRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          {data.orders.length > 0 ? (
+            data.orders.map((order) => (
+              <div key={order.id} className="flex items-center justify-between p-4 border border-border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                <div>
+                  <p className="font-semibold text-brand-text text-sm">{order.id} · {order.productName}</p>
+                  <p className="text-xs text-gray-500">Valor: {formatCurrency(order.value)}</p>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  {order.status === "aguardando_pagamento" && (
+                    <>
+                      <Badge variant="outline" className="text-warning border-warning">Aguardando Pgto</Badge>
+                      <Button 
+                        onClick={() => processarPagamento(order.id, 45.00)}
+                        className="bg-status-info-text hover:bg-status-info-text/90 text-white h-8 text-xs"
+                      >
+                        Processar Pedido
+                      </Button>
+                    </>
+                  )}
+                  {order.status === "processado" && (
+                    <Badge variant="default" className="bg-blue-100 text-blue-800">Processado</Badge>
+                  )}
+                  {order.status === "enviado" && (
+                    <Badge variant="success" className="bg-green-100 text-green-800">Enviado</Badge>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              Nenhuma venda processada ainda. Faça uma simulação no Marketplace para começar!
+            </div>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }

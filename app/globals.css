@@ -1,55 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  /* Cores do nosso Design System (Eliot 1.0) */
-  --color-background: #F3F7F5;
-  --color-foreground: #0F172A;
+  /* Novas Cores baseadas no Figma */
+  --color-background: #F9F8F6; 
+  --color-foreground: #1A1A1A; 
   
-  --color-sidebar: #1A3A32;
-  --color-sidebar-active: #2E5C4E;
+  --color-sidebar: #2A3B32; 
+  --color-sidebar-active: #3C5245; 
   
-  --color-brand-primary: #2E5C4E;
-  --color-brand-text: #0F172A;
+  --color-brand-primary: #3C5245;
+  --color-brand-text: #1A1A1A;
+  --color-brand-muted: #F0EBE1; 
   
-  --color-status-success-bg: #D1FAE5;
-  --color-status-success-text: #065F46;
-  --color-status-warning-bg: #FEF3C7;
-  --color-status-warning-text: #92400E;
-  --color-status-danger-bg: #FEE2E2;
-  --color-status-danger-text: #991B1B;
-  --color-status-neutral-bg: #F3F4F6;
-  --color-status-neutral-text: #374151;
+  --color-status-success-bg: #E6F4EA;
+  --color-status-success-text: #137333;
+  --color-status-warning-bg: #FEF7E0;
+  --color-status-warning-text: #B06000;
+  --color-status-danger-bg: #FCE8E6;
+  --color-status-danger-text: #C5221F;
+  --color-status-info-bg: #E8F0FE;
+  --color-status-info-text: #1967D2;
   
   --color-border: #E5E7EB;
 }
 
-:root {
-  /* Variáveis base para os componentes do shadcn/ui */
-  --background: #F3F7F5;
-  --foreground: #0F172A;
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0F172A;
-  --primary: #2E5C4E;
-  --primary-foreground: #FFFFFF;
-  --secondary: #F3F4F6;
-  --secondary-foreground: #374151;
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
-  --accent: #F3F4F6;
-  --accent-foreground: #0F172A;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #2E5C4E;
-  --radius: 0.5rem;
-}
-
 body {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

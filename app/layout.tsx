@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Geist } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { FinanceProvider } from "@/lib/contexts/FinanceContext";
 
 export const metadata: Metadata = {
-  title: "Eliot 1.0 | Sistema de Estoque",
+  title: "Eliot 1.0",
   description: "Plataforma de gestão para Dropshipping",
 };
 
@@ -16,8 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={cn("font-sans", geist.variable)}>
-      <body>{children}</body>
+    <html lang="pt-BR">
+      <body>
+        <FinanceProvider>
+          {children}
+        </FinanceProvider>
+      </body>
     </html>
   );
 }
