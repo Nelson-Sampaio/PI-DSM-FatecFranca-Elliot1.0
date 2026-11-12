@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { ResetButton } from "@/components/shared/ResetButton";
 import { useOrders } from "@/lib/contexts/OrderContext";
 
 export default function SupplierOrdersPage() {
@@ -15,7 +16,6 @@ export default function SupplierOrdersPage() {
     }).format(value);
   };
 
-  // Função para aprovar o PIX e liberar para o Estoque
   const handleAprovarPix = (orderId: string) => {
     const confirm = window.confirm(
       "Confirmar recebimento do PIX e liberar pedido para separação?"
@@ -26,7 +26,6 @@ export default function SupplierOrdersPage() {
     alert("Pagamento aprovado! Pedido enviado para o Estoque.");
   };
 
-  // Função para renderizar o botão dinâmico baseado no status
   const renderActionButton = (order: any) => {
     switch (order.status) {
       case "aguardando_pagamento":
@@ -71,20 +70,17 @@ export default function SupplierOrdersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-brand-text">
-            Gestão de Pedidos
-          </h1>
+          <h1 className="text-2xl font-bold text-brand-text">Gestão de Pedidos</h1>
           <p className="text-sm text-gray-500 mt-1">
             Aprove pagamentos e acompanhe o fluxo de expedição.
           </p>
         </div>
+        <ResetButton />
       </div>
 
       <Card className="overflow-hidden">
         <div className="p-5 border-b border-border">
-          <h2 className="text-lg font-semibold text-brand-text">
-            Fila de Pedidos
-          </h2>
+          <h2 className="text-lg font-semibold text-brand-text">Fila de Pedidos</h2>
           <p className="text-sm text-gray-500">
             Pedidos aguardando validação financeira e separação.
           </p>
@@ -107,9 +103,7 @@ export default function SupplierOrdersPage() {
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50/50">
-                    <td className="p-4 font-medium text-brand-text">
-                      {order.id}
-                    </td>
+                    <td className="p-4 font-medium text-brand-text">{order.id}</td>
                     <td className="p-4 text-gray-600">
                       {new Date(order.date).toLocaleDateString("pt-BR")}
                     </td>
@@ -117,9 +111,7 @@ export default function SupplierOrdersPage() {
                     <td className="p-4 text-gray-600 capitalize">
                       {order.type === "retirada" ? "Retirada" : "Emissão"}
                     </td>
-                    <td className="p-4 font-medium text-gray-700">
-                      {formatCurrency(order.value)}
-                    </td>
+                    <td className="p-4 font-medium text-gray-700">{formatCurrency(order.value)}</td>
                     <td className="p-4">
                       {order.status === "aguardando_pagamento" && (
                         <Badge variant="outline" className="text-status-warning-text border-status-warning-text">
@@ -147,9 +139,7 @@ export default function SupplierOrdersPage() {
                         </Badge>
                       )}
                     </td>
-                    <td className="p-4">
-                      {renderActionButton(order)}
-                    </td>
+                    <td className="p-4">{renderActionButton(order)}</td>
                   </tr>
                 ))
               ) : (

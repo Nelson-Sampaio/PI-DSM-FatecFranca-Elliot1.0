@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ResetButton } from "@/components/shared/ResetButton";
 import { useOrders, ProductionOrder } from "@/lib/contexts/OrderContext";
 import { mockProducts } from "@/mocks/data";
 
@@ -18,51 +19,33 @@ export default function SupplierProductionPage() {
     { id: "estoque", title: "Estoque" },
   ];
 
-  // 👇 NOVA LÓGICA: Cor baseada na quantidade de ORs abertas para o mesmo produto
   const getCardColor = (op: ProductionOrder) => {
-    // Conta quantas ORs existem para o mesmo produto (independente do estágio)
     const orsDoProduto = productionOrders.filter(o => o.productName === op.productName);
     const qtdORs = orsDoProduto.length;
 
-    if (qtdORs === 1) {
-      // Única OR: Vermelho (urgente, é a única solução)
-      return "border-l-4 border-red-500 bg-red-50 animate-pulse";
-    } else if (qtdORs === 2) {
-      // Duas ORs: Laranja (recurso escasso, precisa ser rápido)
-      return "border-l-4 border-orange-500 bg-orange-50";
-    } else if (qtdORs >= 3 && qtdORs <= 5) {
-      // 3 a 5 ORs: Amarelo (tem opções, mas precisa de atenção)
-      return "border-l-4 border-yellow-500 bg-yellow-50";
-    } else {
-      // Mais de 5 ORs: Azul (estoque seguro, sem urgência)
-      return "border-l-4 border-blue-500 bg-blue-50";
-    }
+    if (qtdORs === 1) return "border-l-4 border-red-500 bg-red-50 animate-pulse";
+    if (qtdORs === 2) return "border-l-4 border-orange-500 bg-orange-50";
+    if (qtdORs >= 3 && qtdORs <= 5) return "border-l-4 border-yellow-500 bg-yellow-50";
+    return "border-l-4 border-blue-500 bg-blue-50";
   };
 
-  // Badge com a mesma lógica
   const getUrgencyBadge = (op: ProductionOrder) => {
     const orsDoProduto = productionOrders.filter(o => o.productName === op.productName);
     const qtdORs = orsDoProduto.length;
 
-    if (qtdORs === 1) {
-      return <Badge variant="destructive" className="text-[10px] animate-pulse">Urgente</Badge>;
-    } else if (qtdORs === 2) {
-      return <Badge className="bg-orange-200 text-orange-800 text-[10px]">Alta</Badge>;
-    } else if (qtdORs >= 3 && qtdORs <= 5) {
-      return <Badge className="bg-yellow-100 text-yellow-800 text-[10px]">Normal</Badge>;
-    } else {
-      return <Badge className="bg-blue-100 text-blue-800 text-[10px]">Seguro</Badge>;
-    }
+    if (qtdORs === 1) return <Badge variant="destructive" className="text-[10px] animate-pulse">Urgente</Badge>;
+    if (qtdORs === 2) return <Badge className="bg-orange-200 text-orange-800 text-[10px]">Alta</Badge>;
+    if (qtdORs >= 3 && qtdORs <= 4) return <Badge className="bg-yellow-100 text-yellow-800 text-[10px]">Normal</Badge>;
+    return <Badge className="bg-blue-100 text-blue-800 text-[10px]">Seguro</Badge>;
   };
 
-  // Texto de comunicação para o operador
   const getUrgencyMessage = (op: ProductionOrder) => {
     const orsDoProduto = productionOrders.filter(o => o.productName === op.productName);
     const qtdORs = orsDoProduto.length;
 
     if (qtdORs === 1) return "Corre que tá acabando! Esta é a única OR.";
     if (qtdORs === 2) return "Anda rápido! Tem só uma reposição além desta.";
-    if (qtdORs >= 3 && qtdORs <= 5) return "Atenção! Existem outras reposições à frente.";
+    if (qtdORs >= 3 && qtdORs <= 4) return "Atenção! Existem outras reposições à frente.";
     return "Sob controle. O estoque está seguro.";
   };
 
@@ -92,6 +75,7 @@ export default function SupplierProductionPage() {
             Acompanhe o Kanban de produção e priorize as ordens de serviço.
           </p>
         </div>
+        <ResetButton />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
@@ -128,7 +112,6 @@ export default function SupplierProductionPage() {
                       <div className="text-[10px] text-gray-600 space-y-1 mb-2">
                         <p>Motivo: Reposição de Estoque</p>
                         <p>Quantidade a produzir: <strong>{op.quantity} un.</strong></p>
-                        {/* 👇 Mensagem de urgência para o operador */}
                         <p className="font-semibold text-brand-text">{getUrgencyMessage(op)}</p>
                       </div>
 
@@ -155,7 +138,6 @@ export default function SupplierProductionPage() {
         ))}
       </div>
 
-      {/* MODAL DE DETALHES DO PRODUTO */}
       {selectedOP && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedOP(null)}>
           <div className="bg-white rounded-xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>

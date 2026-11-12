@@ -47,10 +47,10 @@ export const mockProducts: Product[] = [
       "/marketplace/conjunto5.jpg",
     ],
     variants: [
-      { id: "v1", sku: "CONJ-PT-P", size: "P", color: "Preto", stockMain: 3, stockSupport: 6, stockCritical: 9 },
-      { id: "v2", sku: "CONJ-PT-M", size: "M", color: "Preto", stockMain: 9, stockSupport: 9, stockCritical: 9 },
-      { id: "v3", sku: "CONJ-PT-G", size: "G", color: "Preto", stockMain: 3, stockSupport: 6, stockCritical: 6 },
-      { id: "v4", sku: "CONJ-PT-GG", size: "GG", color: "Preto", stockMain: 1, stockSupport: 1, stockCritical: 2 },
+      { id: "v1", sku: "CONJ-PT-P", size: "P", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v2", sku: "CONJ-PT-M", size: "M", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v3", sku: "CONJ-PT-G", size: "G", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v4", sku: "CONJ-PT-GG", size: "GG", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
     ],
   },
   {
@@ -67,10 +67,10 @@ export const mockProducts: Product[] = [
       "/marketplace/macaquino5.jpg",
     ],
     variants: [
-      { id: "v5", sku: "MAC-PT-P", size: "P", color: "Preto", stockMain: 9, stockSupport: 9, stockCritical: 9 },
-      { id: "v6", sku: "MAC-PT-M", size: "M", color: "Preto", stockMain: 18, stockSupport: 18, stockCritical: 18 },
-      { id: "v7", sku: "MAC-PT-G", size: "G", color: "Preto", stockMain: 18, stockSupport: 18, stockCritical: 18 },
-      { id: "v8", sku: "MAC-PT-GG", size: "GG", color: "Preto", stockMain: 6, stockSupport: 6, stockCritical: 6 },
+      { id: "v5", sku: "MAC-PT-P", size: "P", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v6", sku: "MAC-PT-M", size: "M", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v7", sku: "MAC-PT-G", size: "G", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v8", sku: "MAC-PT-GG", size: "GG", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
     ],
   },
   {
@@ -87,10 +87,10 @@ export const mockProducts: Product[] = [
       "/marketplace/macacao5.jpg",
     ],
     variants: [
-      { id: "v9", sku: "MACA-PT-P", size: "P", color: "Preto", stockMain: 3, stockSupport: 6, stockCritical: 9 },
-      { id: "v10", sku: "MACA-PT-M", size: "M", color: "Preto", stockMain: 9, stockSupport: 9, stockCritical: 9 },
-      { id: "v11", sku: "MACA-PT-G", size: "G", color: "Preto", stockMain: 3, stockSupport: 6, stockCritical: 6 },
-      { id: "v12", sku: "MACA-PT-GG", size: "GG", color: "Preto", stockMain: 1, stockSupport: 1, stockCritical: 2 },
+      { id: "v9", sku: "MACA-PT-P", size: "P", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v10", sku: "MACA-PT-M", size: "M", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v11", sku: "MACA-PT-G", size: "G", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
+      { id: "v12", sku: "MACA-PT-GG", size: "GG", color: "Preto", stockMain: 0, stockSupport: 0, stockCritical: 0 },
     ],
   },
 ];
@@ -103,7 +103,7 @@ export const mockOrders: Order[] = [
     id: "ord-001",
     sellerId: "u3",
     supplierId: "u1",
-    items: [{ productId: "p1", variantId: "v2", quantity: 2, unitPrice: 104.41 }],
+    items: [{ productId: "p1", variantId: "v2", quantity: 0, unitPrice: 104.41 }],
     total: 208.82,
     status: "em_analise_financeira",
     type: "emissao",

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { ResetButton } from "@/components/shared/ResetButton";
 import { useSupplier } from "@/lib/contexts/SupplierContext";
 import { useOrders } from "@/lib/contexts/OrderContext";
 import { mockProducts } from "@/mocks/data";
@@ -13,38 +14,36 @@ import { RefreshCw, Download, Package, ShoppingCart, Users, Factory, TrendingUp 
 
 export default function SupplierHome() {
   const { data, filtroPeriodo, setFiltroPeriodo, resetarDados } = useSupplier();
-  const { orders } = useOrders(); // Puxando os pedidos
+  const { orders } = useOrders();
   const [modalAberto, setModalAberto] = useState<string | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
 
-  // Dados para Gráficos
   const chartDataVendas = [
-    { name: "Shopee", value: 3500 },
-    { name: "Mercado Livre", value: 2500 },
-    { name: "Shein", value: 1500 },
-    { name: "TikTok", value: 1000 },
+    { name: "Shopee", value: 0 },
+    { name: "Mercado Livre", value: 0 },
+    { name: "Shein", value: 0 },
+    { name: "TikTok", value: 0 },
   ];
 
   const chartDataFinanceiro = [
-    { name: "Caixa", value: 4000, color: "#3C5245" },
-    { name: "Despesas", value: 2000, color: "#EF4444" },
-    { name: "Investimento", value: 1500, color: "#F59E0B" },
+    { name: "Caixa", value: 0, color: "#3C5245" },
+    { name: "Despesas", value: 0, color: "#EF4444" },
+    { name: "Investimento", value: 0, color: "#F59E0B" },
   ];
 
   const chartDataProducao = [
-    { name: "Almoxarifado", tempo: 2 },
-    { name: "Corte", tempo: 3 },
-    { name: "Costura", tempo: 5 },
-    { name: "Estoque", tempo: 1 },
+    { name: "Almoxarifado", tempo: 0 },
+    { name: "Corte", tempo: 0 },
+    { name: "Costura", tempo: 0 },
+    { name: "Estoque", tempo: 0 },
   ];
 
   const progressoMeta = (data.receitaDia / data.metaMensal) * 100;
   const metaColor = progressoMeta < 50 ? "bg-red-500" : progressoMeta < 80 ? "bg-yellow-500" : "bg-green-500";
 
-  // Conteúdo de cada modal
   const renderModalContent = () => {
     switch (modalAberto) {
       case "estoque":
@@ -161,7 +160,6 @@ export default function SupplierHome() {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-brand-text">Visão Geral</h1>
@@ -178,16 +176,13 @@ export default function SupplierHome() {
             <option value="mes">Este Mês</option>
             <option value="ano">Este Ano</option>
           </select>
-          <Button variant="outline" onClick={resetarDados} className="flex items-center gap-2">
-            <RefreshCw className="w-4 h-4" /> Resetar
-          </Button>
+          <ResetButton />
           <Button className="bg-sidebar hover:bg-sidebar-active text-white flex items-center gap-2">
             <Download className="w-4 h-4" /> Exportar
           </Button>
         </div>
       </div>
 
-      {/* Cards de KPI */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {[
           { id: "estoque", label: "Estoque Físico", value: formatCurrency(data.estoqueFisico), icon: Package, color: "border-blue-500", bg: "bg-blue-50" },
@@ -211,7 +206,6 @@ export default function SupplierHome() {
         ))}
       </div>
 
-      {/* Meta */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-sm font-semibold text-brand-text">Meta do Mês</h2>
@@ -223,7 +217,6 @@ export default function SupplierHome() {
         </div>
       </Card>
 
-      {/* Gráficos */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6">
           <h2 className="text-sm font-semibold text-brand-text mb-4">Vendas por Marketplace</h2>
@@ -268,7 +261,6 @@ export default function SupplierHome() {
         </Card>
       </div>
 
-      {/* 👇 NOVA SEÇÃO: LISTA DE PEDIDOS DO DIA 👇 */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -322,7 +314,6 @@ export default function SupplierHome() {
         </div>
       </Card>
 
-      {/* MODAL GENÉRICO */}
       {modalAberto && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setModalAberto(null)}>
           <div className="bg-white rounded-xl max-w-2xl w-full p-6" onClick={(e) => e.stopPropagation()}>

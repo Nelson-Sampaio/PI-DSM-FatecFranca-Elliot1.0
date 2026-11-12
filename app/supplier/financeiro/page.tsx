@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { FormInput } from "@/components/ui/FormInput";
+import { ResetButton } from "@/components/shared/ResetButton";
 import { useFinance } from "@/lib/contexts/FinanceContext";
 import { useOrders } from "@/lib/contexts/OrderContext";
 import { mockProducts } from "@/mocks/data";
@@ -21,20 +22,17 @@ export default function SupplierFinanceiroPage() {
   const { orders, productionOrders } = useOrders();
   const [modalAberto, setModalAberto] = useState<string | null>(null);
 
-  // --- ESTADOS MODAL CUSTOS ---
   const [custoProduto, setCustoProduto] = useState(0);
   const [custoInsumos, setCustoInsumos] = useState(0);
   const [custoMaoDeObra, setCustoMaoDeObra] = useState(0);
   const [custoEstocagem, setCustoEstocagem] = useState(0);
-  const [margemLucro, setMargemLucro] = useState(30);
+  const [margemLucro, setMargemLucro] = useState(0);
 
-  // --- ESTADOS MODAL INSUMOS ---
   const [nomeInsumo, setNomeInsumo] = useState("");
   const [fornecedorInsumo, setFornecedorInsumo] = useState("");
   const [precoInsumo, setPrecoInsumo] = useState(0);
   const [quantidadeInsumo, setQuantidadeInsumo] = useState(0);
 
-  // --- CÁLCULOS DO MODAL DE CUSTOS ---
   const custoTotal = custoProduto + custoInsumos + custoMaoDeObra + custoEstocagem;
   const precoSugerido = custoTotal + (custoTotal * (margemLucro / 100));
 
@@ -42,7 +40,6 @@ export default function SupplierFinanceiroPage() {
     return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
   };
 
-  // Cálculos Dinâmicos dos Cards
   const valorEstoque = mockProducts.reduce((acc, p) => {
     const totalStock = p.variants.reduce((sum, v) => sum + v.stockMain, 0);
     return acc + (totalStock * p.price);
@@ -54,12 +51,10 @@ export default function SupplierFinanceiroPage() {
 
   const valorSaldo = data.faturamentoTotal - data.despesasOperacao - data.despesasFornecedor;
 
-  // Lista de todos os pedidos (para o Movimento do Dia)
   const todosPedidos = orders;
 
   return (
     <div className="space-y-6 max-w-6xl">
-      {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-brand-text">Financeiro</h1>
@@ -68,6 +63,7 @@ export default function SupplierFinanceiroPage() {
           </p>
         </div>
         <div className="flex gap-3">
+          <ResetButton />
           <Button 
             onClick={() => setModalAberto("custos")}
             className="bg-white border border-border text-gray-700 hover:bg-gray-50 flex items-center gap-2"
@@ -83,7 +79,6 @@ export default function SupplierFinanceiroPage() {
         </div>
       </div>
 
-      {/* Cards de Processo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 border-t-4 border-blue-500 bg-blue-50/50">
           <div className="flex items-center gap-3 mb-4">
@@ -152,7 +147,6 @@ export default function SupplierFinanceiroPage() {
         </Card>
       </div>
 
-      {/* Lista de Movimento do Dia */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -185,7 +179,6 @@ export default function SupplierFinanceiroPage() {
                     <td className="p-3 text-gray-600">{order.sellerName}</td>
                     <td className="p-3 font-medium text-gray-700">{formatCurrency(order.value)}</td>
                     <td className="p-3">
-                      {/* Badges de Status */}
                       {order.status === "aguardando_pagamento" && (
                         <Badge variant="outline" className="text-status-warning-text border-status-warning-text">Aguardando PIX</Badge>
                       )}
@@ -216,7 +209,6 @@ export default function SupplierFinanceiroPage() {
         </div>
       </Card>
 
-      {/* --- MODAL DE CUSTOS --- */}
       {modalAberto === "custos" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setModalAberto(null)}>
           <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
@@ -266,7 +258,6 @@ export default function SupplierFinanceiroPage() {
         </div>
       )}
 
-      {/* --- MODAL DE INSUMOS --- */}
       {modalAberto === "insumos" && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setModalAberto(null)}>
           <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>

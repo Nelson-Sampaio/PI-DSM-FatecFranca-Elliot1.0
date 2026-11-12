@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { ResetButton } from "@/components/shared/ResetButton";
 import { useOrders } from "@/lib/contexts/OrderContext";
 import { Search, Download, ExternalLink } from "lucide-react";
 
@@ -58,11 +59,11 @@ export default function SellerOrdersPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-brand-text">Minhas Vendas</h1>
-          <p className="text-sm text-gray-500 mt-1">Acompanhe seus pedidos e realize o pagamento dos pendentes.</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Acompanhe seus pedidos e realize o pagamento dos pendentes.
+          </p>
         </div>
-        <Button className="bg-sidebar hover:bg-sidebar-active text-white flex items-center gap-2">
-          <Download className="w-4 h-4" /> Relatório Detalhado
-        </Button>
+        <ResetButton />
       </div>
 
       <Card className="p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -80,16 +81,17 @@ export default function SellerOrdersPage() {
         <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
           {[
             { id: "todos", label: "Todos" },
-            { id: "aguardando_pagamento", label: "Aguardando Pgto" },
+            { id: "aguardando_pagamento", label: "Aguardando" },
             { id: "em_processamento", label: "Em Processamento" },
-            { id: "pago", label: "Pago" },
             { id: "pedido_enviado", label: "Enviado" },
           ].map((filtro) => (
             <button
               key={filtro.id}
               onClick={() => setFilterStatus(filtro.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                filterStatus === filtro.id ? "bg-brand-primary text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                filterStatus === filtro.id
+                  ? "bg-brand-primary text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {filtro.label}
@@ -115,7 +117,6 @@ export default function SellerOrdersPage() {
                 <div className="flex items-center gap-4">
                   {order.status === "aguardando_pagamento" && (
                     <Button 
-                      // 👇 AQUI: REMOVE O '#' ANTES DE ENVIAR PARA A URL
                       onClick={() => router.push(`/seller/checkout?orderId=${order.id.replace("#", "")}`)}
                       className="bg-status-warning-text hover:bg-status-warning-text/90 text-white h-9 px-4 text-xs font-semibold flex items-center gap-2"
                     >

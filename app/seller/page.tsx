@@ -5,11 +5,12 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ResetButton } from "@/components/shared/ResetButton";
 import { useFinance } from "@/lib/contexts/FinanceContext";
-import { Bell, ArrowRight, Trash2 } from "lucide-react";
+import { Bell, ArrowRight } from "lucide-react";
 
 export default function SellerDashboard() {
-  const { data, resetarDados } = useFinance();
+  const { data } = useFinance();
   const [hasNotifications, setHasNotifications] = useState(true);
 
   useEffect(() => {
@@ -59,7 +60,6 @@ export default function SellerDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-brand-text">Bom dia, Amanda.</h1>
@@ -69,20 +69,7 @@ export default function SellerDashboard() {
         </div>
         
         <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              if(confirm("Tem certeza que deseja zerar todos os dados da simulação?")) {
-                resetarDados();
-                window.location.reload();
-              }
-            }}
-            className="text-red-500 border-red-200 hover:bg-red-50 flex items-center gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            Zerar Simulação
-          </Button>
-
+          <ResetButton />
           <div className="relative">
             <Button variant="outline" className="relative px-4 py-2 border-border bg-white">
               <Bell className="w-5 h-5 text-gray-600" />
@@ -94,7 +81,6 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/* Grid de KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <Card className={`p-6 border-t-4 ${faturamentoStatus.borderColor} ${faturamentoStatus.cardBg} shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer`}>
@@ -125,7 +111,6 @@ export default function SellerDashboard() {
         </motion.div>
       </div>
 
-      {/* Seção de Produtos (Fundo Verde) */}
       <div className="bg-[#E6EFE9] p-6 rounded-2xl relative">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -166,7 +151,6 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/* Seção de Últimas Vendas (Removida pois agora usamos o OrderContext) */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-brand-text">Suas últimas vendas</h2>
