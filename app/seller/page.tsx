@@ -6,11 +6,10 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useFinance } from "@/lib/contexts/FinanceContext";
-import { Bell, ArrowRight, Trash2 } from "lucide-react"; // Adicionei o Trash2
+import { Bell, ArrowRight, Trash2 } from "lucide-react";
 
 export default function SellerDashboard() {
-  // 1. Desestruturamos o resetarDados aqui
-  const { data, processarPagamento, resetarDados } = useFinance();
+  const { data, resetarDados } = useFinance();
   const [hasNotifications, setHasNotifications] = useState(true);
 
   useEffect(() => {
@@ -60,9 +59,7 @@ export default function SellerDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* ========================================================= */}
-      {/* CABEÇALHO (Aqui vai o botão de Reset e de Notificação)    */}
-      {/* ========================================================= */}
+      {/* Cabeçalho */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-brand-text">Bom dia, Amanda.</h1>
@@ -71,9 +68,7 @@ export default function SellerDashboard() {
           </p>
         </div>
         
-        {/* Bloco da direita (Reset + Notificação) */}
         <div className="flex items-center gap-4">
-          {/* Botão de Reset */}
           <Button 
             variant="outline" 
             onClick={() => {
@@ -88,7 +83,6 @@ export default function SellerDashboard() {
             Zerar Simulação
           </Button>
 
-          {/* Botão de Notificação */}
           <div className="relative">
             <Button variant="outline" className="relative px-4 py-2 border-border bg-white">
               <Bell className="w-5 h-5 text-gray-600" />
@@ -172,7 +166,7 @@ export default function SellerDashboard() {
         </div>
       </div>
 
-      {/* Seção de Últimas Vendas (Dinâmica e Funcional) */}
+      {/* Seção de Últimas Vendas (Removida pois agora usamos o OrderContext) */}
       <Card className="p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-brand-text">Suas últimas vendas</h2>
@@ -181,41 +175,8 @@ export default function SellerDashboard() {
           </Button>
         </div>
 
-        <div className="space-y-3">
-          {data.orders.length > 0 ? (
-            data.orders.map((order) => (
-              <div key={order.id} className="flex items-center justify-between p-4 border border-border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div>
-                  <p className="font-semibold text-brand-text text-sm">{order.id} · {order.productName}</p>
-                  <p className="text-xs text-gray-500">Valor: {formatCurrency(order.value)}</p>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  {order.status === "aguardando_pagamento" && (
-                    <>
-                      <Badge variant="outline" className="text-warning border-warning">Aguardando Pgto</Badge>
-                      <Button 
-                        onClick={() => processarPagamento(order.id, 45.00)}
-                        className="bg-status-info-text hover:bg-status-info-text/90 text-white h-8 text-xs"
-                      >
-                        Processar Pedido
-                      </Button>
-                    </>
-                  )}
-                  {order.status === "processado" && (
-                    <Badge variant="default" className="bg-blue-100 text-blue-800">Processado</Badge>
-                  )}
-                  {order.status === "enviado" && (
-                    <Badge variant="success" className="bg-green-100 text-green-800">Enviado</Badge>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center text-gray-500 py-8">
-              Nenhuma venda processada ainda. Faça uma simulação no Marketplace para começar!
-            </div>
-          )}
+        <div className="text-center text-gray-500 py-8">
+          Acesse a aba "Pedidos" para ver o andamento das suas vendas em tempo real.
         </div>
       </Card>
     </div>

@@ -1,69 +1,79 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { orderService } from "@/lib/services/order.service";
-import { Order } from "@/types";
+import { Badge } from "@/components/ui/Badge";
+import { useOrders } from "@/lib/contexts/OrderContext";
 
 export default function SupplierOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { orders, updateOrderStatus } = useOrders();
 
-  // Função para carregar os pedidos
-  const loadOrders = async () => {
-    const data = await orderService.getOrders();
-    setOrders(data);
-    setIsLoading(false);
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
   };
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  const handleApprove = async (orderId: string) => {
-    const confirm = window.confirm("Confirmar recebimento do PIX e liberar pedido para expedição/produção?");
+  // Função para aprovar o PIX e liberar para o Estoque
+  const handleAprovarPix = (orderId: string) => {
+    const confirm = window.confirm(
+      "Confirmar recebimento do PIX e liberar pedido para separação?"
+    );
     if (!confirm) return;
 
-    // 1. Atualiza o status na tabela visualmente
-    setOrders((prevOrders: Order[]) =>
-      prevOrders.map((order: Order) =>
-        order.id === orderId
-          ? { ...order, status: "em_separacao" as const }
-          : order
-      )
-    );
-    
-    // 2. Salva a nova ordem de produção no localStorage para o Kanban ler
-    const orderToApprove = orders.find((o: Order) => o.id === orderId);
-    if (orderToApprove) {
-      const savedOPs = localStorage.getItem("ordens_producao");
-      const currentOPs = savedOPs ? JSON.parse(savedOPs) : [];
-      
-      const newOP = {
-        id: `OP-${Math.floor(Math.random() * 1000)}`,
-        product: "Camisa Social Azul", // Puxado do mock, simplificado para a demo
-        quantity: orderToApprove.items[0].quantity,
-        priority: "Alta",
-        stage: "corte", // Entra direto no corte
-      };
-
-      localStorage.setItem("ordens_producao", JSON.stringify([...currentOPs, newOP]));
-    }
-    
-    alert("Pagamento aprovado! Pedido enviado para a Expedição e Ordem de Produção gerada.");
+    updateOrderStatus(orderId, "pago");
+    alert("Pagamento aprovado! Pedido enviado para o Estoque.");
   };
 
-  if (isLoading) {
-    return <div className="p-8 text-center text-gray-500">Carregando pedidos...</div>;
-  }
+  // Função para renderizar o botão dinâmico baseado no status
+  const renderActionButton = (order: any) => {
+    switch (order.status) {
+      case "aguardando_pagamento":
+        return (
+          <Button variant="outline" disabled className="h-8 px-4 text-xs text-gray-400">
+            Aguardando Seller
+          </Button>
+        );
+      case "em_processamento":
+        return (
+          <Button
+            onClick={() => handleAprovarPix(order.id)}
+            className="bg-status-success-text hover:bg-status-success-text/90 text-white h-8 px-4 text-xs font-semibold"
+          >
+            Aprovar PIX
+          </Button>
+        );
+      case "pago":
+        return (
+          <Button variant="outline" disabled className="h-8 px-4 text-xs text-blue-600 border-blue-200 bg-blue-50">
+            No Estoque
+          </Button>
+        );
+      case "aguardando_retirada":
+        return (
+          <Badge variant="default" className="bg-orange-100 text-orange-800">
+            Aguardando Retirada
+          </Badge>
+        );
+      case "pedido_enviado":
+        return (
+          <Badge variant="success" className="bg-green-100 text-green-800">
+            Pedido Enviado
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-brand-text">Gestão de Pedidos</h1>
+          <h1 className="text-2xl font-bold text-brand-text">
+            Gestão de Pedidos
+          </h1>
           <p className="text-sm text-gray-500 mt-1">
             Aprove pagamentos e acompanhe o fluxo de expedição.
           </p>
@@ -72,8 +82,12 @@ export default function SupplierOrdersPage() {
 
       <Card className="overflow-hidden">
         <div className="p-5 border-b border-border">
-          <h2 className="text-lg font-semibold text-brand-text">Fila de Pedidos</h2>
-          <p className="text-sm text-gray-500">Pedidos aguardando validação financeira e expedição.</p>
+          <h2 className="text-lg font-semibold text-brand-text">
+            Fila de Pedidos
+          </h2>
+          <p className="text-sm text-gray-500">
+            Pedidos aguardando validação financeira e separação.
+          </p>
         </div>
 
         <div className="overflow-x-auto">
@@ -82,52 +96,69 @@ export default function SupplierOrdersPage() {
               <tr className="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
                 <th className="p-4 font-medium">ID do Pedido</th>
                 <th className="p-4 font-medium">Data</th>
-                <th className="p-4 font-medium">Marketplace</th>
+                <th className="p-4 font-medium">Seller</th>
+                <th className="p-4 font-medium">Tipo</th>
                 <th className="p-4 font-medium">Total</th>
                 <th className="p-4 font-medium">Status</th>
                 <th className="p-4 font-medium">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-sm">
-              {orders.map((order: Order) => (
-                <tr key={order.id} className="hover:bg-gray-50/50">
-                  <td className="p-4 font-medium text-brand-text">#{order.id}</td>
-                  <td className="p-4 text-gray-600">
-                    {new Date(order.createdAt).toLocaleDateString("pt-BR")}
-                  </td>
-                  <td className="p-4 capitalize text-gray-600">
-                    {order.marketplace?.replace("_", " ")}
-                  </td>
-                  <td className="p-4 font-medium text-gray-700">
-                    R$ {order.total.toFixed(2).replace(".", ",")}
-                  </td>
-                  <td className="p-4">
-                    <Badge variant={
-                      order.status === "em_analise_financeira" ? "outline" : 
-                      order.status === "em_separacao" ? "default" : 
-                      "destructive"
-                    }>
-                      {order.status === "em_analise_financeira" ? "Aguardando PIX" : 
-                       order.status === "em_separacao" ? "Em Separação" : 
-                       order.status}
-                    </Badge>
-                  </td>
-                  <td className="p-4">
-                    {order.status === "em_analise_financeira" ? (
-                      <Button 
-                        onClick={() => handleApprove(order.id)}
-                        className="bg-status-success-text hover:bg-status-success-text/90 text-white h-8 px-4 text-xs"
-                      >
-                        Aprovar PIX
-                      </Button>
-                    ) : (
-                      <Button variant="outline" className="h-8 px-4 text-xs text-gray-400" disabled>
-                        Aguardando Expedição
-                      </Button>
-                    )}
+              {orders.length > 0 ? (
+                orders.map((order) => (
+                  <tr key={order.id} className="hover:bg-gray-50/50">
+                    <td className="p-4 font-medium text-brand-text">
+                      {order.id}
+                    </td>
+                    <td className="p-4 text-gray-600">
+                      {new Date(order.date).toLocaleDateString("pt-BR")}
+                    </td>
+                    <td className="p-4 text-gray-600">{order.sellerName}</td>
+                    <td className="p-4 text-gray-600 capitalize">
+                      {order.type === "retirada" ? "Retirada" : "Emissão"}
+                    </td>
+                    <td className="p-4 font-medium text-gray-700">
+                      {formatCurrency(order.value)}
+                    </td>
+                    <td className="p-4">
+                      {order.status === "aguardando_pagamento" && (
+                        <Badge variant="outline" className="text-status-warning-text border-status-warning-text">
+                          Aguardando PIX
+                        </Badge>
+                      )}
+                      {order.status === "em_processamento" && (
+                        <Badge variant="default" className="bg-blue-100 text-blue-800">
+                          Em Processamento
+                        </Badge>
+                      )}
+                      {order.status === "pago" && (
+                        <Badge variant="success" className="bg-green-100 text-green-800">
+                          PIX Aprovado
+                        </Badge>
+                      )}
+                      {order.status === "aguardando_retirada" && (
+                        <Badge variant="default" className="bg-orange-100 text-orange-800">
+                          Aguardando Retirada
+                        </Badge>
+                      )}
+                      {order.status === "pedido_enviado" && (
+                        <Badge variant="success" className="bg-teal-100 text-teal-800">
+                          Pedido Enviado
+                        </Badge>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {renderActionButton(order)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-gray-500">
+                    Nenhum pedido na fila. Faça uma simulação no Marketplace Fake!
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

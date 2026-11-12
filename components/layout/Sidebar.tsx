@@ -6,13 +6,11 @@ import { User } from "@/types";
 import { 
   LayoutDashboard, 
   ShoppingCart, 
-  Store, 
-  Calculator, 
-  Wallet, 
   Package, 
   Factory, 
   Settings, 
-  LogOut 
+  LogOut,
+  Wallet // Ícone para Financeiro
 } from "lucide-react";
 
 interface SidebarProps {
@@ -22,18 +20,19 @@ interface SidebarProps {
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   
-  // Menu com ícones baseados no perfil
+  // Menu do Fornecedor atualizado
   const menuItems = user.role === "supplier" 
     ? [
         { label: "Visão geral", href: "/supplier", icon: LayoutDashboard },
         { label: "Estoque", href: "/supplier/estoque", icon: Package },
         { label: "Pedidos", href: "/supplier/pedidos", icon: ShoppingCart },
         { label: "Produção", href: "/supplier/producao", icon: Factory },
+        { label: "Financeiro", href: "/supplier/financeiro", icon: Wallet }, // Novo link
       ]
     : [
         { label: "Visão geral", href: "/seller", icon: LayoutDashboard },
-        { label: "Catálogo", href: "/seller/catalogo", icon: Store },
-        { label: "Calculadora", href: "/seller/calculadora", icon: Calculator },
+        { label: "Catálogo", href: "/seller/catalogo", icon: Package },
+        { label: "Calculadora", href: "/seller/calculadora", icon: Factory }, // Exemplo
         { label: "Pedidos", href: "/seller/pedidos", icon: ShoppingCart },
         { label: "Financeiro", href: "/seller/financeiro", icon: Wallet },
       ];

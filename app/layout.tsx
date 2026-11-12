@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { FinanceProvider } from "@/lib/contexts/FinanceContext";
+import { OrderProvider } from "@/lib/contexts/OrderContext";
 
 export const metadata: Metadata = {
   title: "Eliot 1.0",
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body>
-        <FinanceProvider>
-          {children}
-        </FinanceProvider>
+        <OrderProvider>
+          <FinanceProvider>
+            {children}
+          </FinanceProvider>
+        </OrderProvider>
       </body>
     </html>
   );

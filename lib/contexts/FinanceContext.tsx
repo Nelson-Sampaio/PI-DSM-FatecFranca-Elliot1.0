@@ -1,14 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-export interface Order {
-  id: string;
-  productName: string;
-  value: number;
-  status: "aguardando_pagamento" | "processado" | "enviado";
-  date: string;
-}
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 interface FinanceData {
   faturamentoTotal: number;
@@ -22,14 +20,12 @@ interface FinanceData {
   lucroReal: number;
   despesasFornecedor: number;
   despesasOperacao: number;
-  orders: Order[];
 }
 
 interface FinanceContextType {
   data: FinanceData;
   registrarVenda: (valor: number, custo: number, productName: string) => void;
-  processarPagamento: (orderId: string, custo: number) => void;
-  resetarDados: () => void; // ADICIONADO
+  resetarDados: () => void;
 }
 
 const initialState: FinanceData = {
@@ -44,7 +40,6 @@ const initialState: FinanceData = {
   lucroReal: 0,
   despesasFornecedor: 0,
   despesasOperacao: 0,
-  orders: [],
 };
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
@@ -70,46 +65,26 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const registrarVenda = (valorVenda: number, custoProduto: number, productName: string) => {
+  const registrarVenda = (
+    valorVenda: number,
+    custoProduto: number,
+    productName: string,
+  ) => {
     setData((prev) => {
-      const newOrder: Order = {
-        id: `#${Math.floor(Math.random() * 10000)}`,
-        productName: productName,
-        value: valorVenda,
-        status: "aguardando_pagamento",
-        date: new Date().toISOString(),
-      };
-
-      const newData = { ...prev, orders: [newOrder, ...prev.orders] };
-      localStorage.setItem("eliot_finance_data", JSON.stringify(newData));
-      return newData;
-    });
-  };
-
-  const processarPagamento = (orderId: string, custoProduto: number) => {
-    setData((prev) => {
-      const order = prev.orders.find((o) => o.id === orderId);
-      if (!order || order.status !== "aguardando_pagamento") return prev;
-
-      const updatedOrders = prev.orders.map((o) =>
-        o.id === orderId ? { ...o, status: "processado" as const } : o
-      );
-
-      const margem = order.value * 0.30;
+      const margem = valorVenda * 0.3;
       const newData = {
         ...prev,
-        orders: updatedOrders,
-        faturamentoTotal: prev.faturamentoTotal + order.value,
+        faturamentoTotal: prev.faturamentoTotal + valorVenda,
         pedidosProcessados: prev.pedidosProcessados + 1,
-        comissoes: prev.comissoes + (order.value * 0.10),
-        caixa: prev.caixa + (margem * 0.33),
-        investimento: prev.investimento + (margem * 0.06),
-        devolucoes: prev.devolucoes + (margem * 0.03),
-        manutencoes: prev.manutencoes + (margem * 0.06),
-        imprevistos: prev.imprevistos + (margem * 0.16),
-        lucroReal: prev.lucroReal + (margem * 0.16),
+        comissoes: prev.comissoes + valorVenda * 0.1,
+        caixa: prev.caixa + margem * 0.33,
+        investimento: prev.investimento + margem * 0.06,
+        devolucoes: prev.devolucoes + margem * 0.03,
+        manutencoes: prev.manutencoes + margem * 0.06,
+        imprevistos: prev.imprevistos + margem * 0.16,
+        lucroReal: prev.lucroReal + margem * 0.16,
         despesasFornecedor: prev.despesasFornecedor + custoProduto,
-        despesasOperacao: prev.despesasOperacao + 5.00,
+        despesasOperacao: prev.despesasOperacao + 5.0,
       };
 
       localStorage.setItem("eliot_finance_data", JSON.stringify(newData));
@@ -117,14 +92,13 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  // ADICIONADO: Função de Reset
   const resetarDados = () => {
     setData(initialState);
     localStorage.removeItem("eliot_finance_data");
   };
 
   return (
-    <FinanceContext.Provider value={{ data, registrarVenda, processarPagamento, resetarDados }}>
+    <FinanceContext.Provider value={{ data, registrarVenda, resetarDados }}>
       {children}
     </FinanceContext.Provider>
   );
@@ -132,6 +106,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
 
 export const useFinance = () => {
   const context = useContext(FinanceContext);
-  if (!context) throw new Error("useFinance deve ser usado dentro de FinanceProvider");
+  if (!context)
+    throw new Error("useFinance deve ser usado dentro de FinanceProvider");
   return context;
 };
