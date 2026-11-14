@@ -34,3 +34,8 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Designe
+-------------------------------------------
+Link para acessar o desenvolvimento do projeto interdiciplinar feito no figma. Por aqui voce tera acesso ao designe das paginas do nosso projeto, também podendo ter interções por ferramentas que o figma oferece. Acaesso o link:
+https://www.figma.com/design/i4gVZIZj9700HmlWMdaknY/Sem-t%C3%ADtulo?node-id=0-1&t=MC0pCouTN1uSXN0e-1
